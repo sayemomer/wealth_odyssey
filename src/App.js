@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import Button from './components/button/button';
-import Scenario from './pages/scenario/scenario';
+import ScenarioFactors from './pages/scenarioFactors/scenarioFactors';
 
 // Define preset ideal expenditure percentages (in % of income)
 const presets = {
@@ -120,7 +120,7 @@ function App() {
   return (
     <div className="app">
       <h1>Financial Wellness Companion</h1>
-      <Scenario />
+      <ScenarioFactors />
 
       {/* User Profile Setup
       <div className="form-section">
