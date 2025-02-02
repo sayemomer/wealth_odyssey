@@ -6,6 +6,7 @@ import Login from './pages/login';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/homePage/homePage';
 import GameInfoPage from './pages/GameInfoPage/GameInfoPage';
+import ScenarioFactors from './pages/scenarioFactors/scenarioFactors';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <div className="app">
         <Routes>
           <Route path="/scenario" element={<Scenario />} />
+          <Route path="/scenarioFact" element={<ScenarioFactors />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/gameinfo" element={<GameInfoPage/>} />
