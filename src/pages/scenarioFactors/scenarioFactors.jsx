@@ -19,8 +19,6 @@ const ScenarioFactors = () => {
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const [matcFactors, setmatcFactors] = useState([]);
 
-
-
   const handleFactorCheck = (index) => {
     setCheckedFactors((prevChecked) =>
       prevChecked.includes(index)
@@ -137,7 +135,10 @@ const ScenarioFactors = () => {
             >
               Bullish
             </Button>
-            <Button variant="contained" color="error" disabled={buttonsDisabled}
+            <Button
+              variant="contained"
+              color="error"
+              disabled={buttonsDisabled}
             >
               Bearish
             </Button>
@@ -154,9 +155,12 @@ const ScenarioFactors = () => {
       {showResponse && (
         <section className="response">
           <div className="response__factorChecker">
-          {`${matcFactors.length} out of  ${Object.keys(
-      scenario.investment_factors.most_likely_factors
-    ).map(Number).length} factors matched.`}
+            {`${matcFactors.length} out of  ${
+              Object.keys(scenario.investment_factors.most_likely_factors).map(
+                Number
+              ).length
+            } factors matched.`}
+            
           </div>
         </section>
       )}
