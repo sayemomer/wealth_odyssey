@@ -1,0 +1,7 @@
+I am going to give you Management's Discussion and Analysis of Financial Condition and Results of Operations of a Company.
+
+First : Your work is to go through this data and summarize it for me focusing on most important investment factors within 100 words, Like this format; for example:
+
+“For the three months ended January 1, 1994, Unifi, Inc. reported net operating cash outflows of $213.9 million, driven by increased receivables (from discontinuing an asset sale) and higher inventories due to grain cost increases and seasonal factors. Financing activities provided $255.4 million in cash, largely from ceasing the sale of accounts receivable and additional long-term debt via commercial paper issuance. Working capital rose to $577.6 million, boosting the current ratio to 2.13:1. Long-term debt increased by $245 million, now comprising 45.3% of total capitalization, supported by revolving credit facilities and institutional notes.”
+
+Second: You need to come up with 10  factors in a table format by which user can decide to invest in this company or not .
