@@ -1,0 +1,32 @@
+// Scenario.scss
+
+.scenario {
+  &__text
+    &-description {
+
+  }
+  &__factor{
+    &-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    &-item {
+      display: flex;
+      flex-direction: column;
+      align-items:start;
+      justify-content:left;
+    }
+
+    &-hint {
+      &__text {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+
+
+  
+}
