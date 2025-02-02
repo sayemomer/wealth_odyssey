@@ -1,0 +1,11 @@
+user_id,date,category,amount,description
+1,2023-01-05,travel,200,Flight to New York
+1,2023-01-07,food,50,Lunch at local cafe
+1,2023-01-08,entertainment,30,Movie ticket
+1,2023-01-10,utilities,100,Electricity bill
+1,2023-01-12,food,80,Dinner at restaurant
+1,2023-01-15,travel,150,Hotel booking
+1,2023-01-20,food,45,Snacks and coffee
+1,2023-01-22,shopping,120,Clothes purchase
+1,2023-01-25,entertainment,60,Concert ticket
+1,2023-01-28,other,70,Grocery shopping

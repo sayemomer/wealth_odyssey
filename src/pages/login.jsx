@@ -1,116 +1,206 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Input from "@mui/material/Input";
-import FormHelperText from "@mui/material/FormHelperText";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import TextField from "@mui/material/TextField";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
+import {
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  FormControl,
+  InputLabel,
+  TextField,
+  Select,
+  MenuItem,
+  Button
+} from "@mui/material";
 import { spendingPersonasData } from "../assets/spendingPersonasData"; // Assuming this is an array of objects
+import "./login.scss";
 
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
-    gender: "",
     income: "",
     userPersona: ""
   });
-  const [updatedIncome, setUpdatedIncome] = useState(null); // To store the updated income
+
+  // Maintain custom percentages for each spending category.
+  // These will be loaded from the persona defaults when a persona is selected.
+  const [customPercentages, setCustomPercentages] = useState({
+    dining: 25,
+    entertainment: 10,
+    groceries: 15,
+    transportation: 10,
+    others: 20
+  });
+
+  // Initialize updatedIncome (savings) to 0
+  const [updatedIncome, setUpdatedIncome] = useState(0);
+
+  // Recalculate updatedIncome whenever income or custom percentages change.
+  useEffect(() => {
+    if (formData.income) {
+      const totalPercentage = Object.values(customPercentages).reduce(
+        (acc, curr) => acc + Number(curr),
+        0
+      );
+      const deductionAmount = (Number(formData.income) * totalPercentage) / 100;
+      const newIncome = Number(formData.income) - deductionAmount;
+      setUpdatedIncome(newIncome);
+    } else {
+      setUpdatedIncome(0);
+    }
+  }, [formData.income, customPercentages]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    if (name === "userPersona") {
+      // Update both formData and load the default percentages from the persona data.
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+      const personaData = spendingPersonasData[0][value];
+      if (personaData) {
+        setCustomPercentages(personaData);
+      }
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
+  // Routes to the next page with the current selections.
   const handleSubmit = () => {
-    // Get the selected persona data
-    const selectedPersona = formData.userPersona;
-    const personaData = spendingPersonasData[0][selectedPersona]; // Fetch data of the selected persona
-    if (personaData) {
-      // Sum up all the percentages of the categories for the selected persona
-      const totalPercentage = Object.values(personaData).reduce((acc, curr) => acc + curr, 0);
-      // Calculate the deduction from the income based on the total percentage
-      const deductionAmount = (formData.income * totalPercentage) / 100;
-      const newIncome = formData.income - deductionAmount;
-      setUpdatedIncome(newIncome); // Update the income with the deduction
+    const updatedFormData = { 
+      ...formData, 
+      saving: updatedIncome, 
+      customPercentages 
+    };
+    localStorage.setItem("userData", JSON.stringify(updatedFormData));
+    navigate("/gameinfo", { state: updatedFormData });
+  };
 
-      // Update the form data with the new income
-      const updatedFormData = { ...formData, saving: newIncome };
-  
-      // Save the updated form data (including new income) to local storage
-      localStorage.setItem("userData", JSON.stringify(updatedFormData));
-    }
-    navigate("/scenario");
+  // Optional: Save data without navigating
+  const handleSave = () => {
+    const updatedFormData = { 
+      ...formData, 
+      saving: updatedIncome, 
+      customPercentages 
+    };
+    localStorage.setItem("userData", JSON.stringify(updatedFormData));
+    console.log("Data saved to local storage:", JSON.stringify(updatedFormData));
   };
 
   return (
-    <div className="login">
-      <FormControl fullWidth margin="normal">
-        <TextField
-          label="Name"
-          variant="outlined"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-      </FormControl>
-
-      <FormControl component="fieldset" margin="normal">
-        <FormLabel component="legend">Gender</FormLabel>
-        <RadioGroup row name="gender" value={formData.gender} onChange={handleChange}>
-          <FormControlLabel value="male" control={<Radio />} label="Male" />
-          <FormControlLabel value="female" control={<Radio />} label="Female" />
-          <FormControlLabel value="other" control={<Radio />} label="Other" />
-        </RadioGroup>
-      </FormControl>
-
-      <FormControl fullWidth margin="normal">
-        <TextField
-          label="Income"
-          type="number"
-          variant="outlined"
-          name="income"
-          value={formData.income}
-          onChange={handleChange}
-        />
-      </FormControl>
-
-      <FormControl fullWidth margin="normal">
-        <InputLabel>User Persona</InputLabel>
-        <Select
-          name="userPersona"
-          value={formData.userPersona}
-          onChange={handleChange}
-        >
-          {Object.keys(spendingPersonasData[0]).map((persona, index) => (
-            <MenuItem key={index} value={persona}>
-              {persona}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <Button variant="contained" color="success" fullWidth onClick={handleSubmit}>
-        Start
-      </Button>
-
-      {/* Optionally, display the updated income */}
-      {updatedIncome !== null && (
-        <div className="updated-income">
-          <h3>Updated Income: ${updatedIncome.toFixed(2)}</h3>
-        </div>
-      )}
-    </div>
+    <Container maxWidth="sm">
+      <Box mt={4}>
+        <Card>
+          <CardContent>
+            <Typography variant="h4" align="center" gutterBottom>
+              Welcome to Financial Wellness Companion
+            </Typography>
+            <Typography variant="body1" align="center" gutterBottom>
+              Start tracking your finances and build a healthier financial future.
+            </Typography>
+            <Box mt={2}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <FormControl fullWidth variant="outlined">
+                    <TextField
+                      label="Name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth variant="outlined">
+                    <TextField
+                      label="Income"
+                      type="number"
+                      name="income"
+                      value={formData.income}
+                      onChange={handleChange}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel>User Persona</InputLabel>
+                    <Select
+                      label="User Persona"
+                      name="userPersona"
+                      value={formData.userPersona}
+                      onChange={handleChange}
+                    >
+                      {Object.keys(spendingPersonasData[0]).map((persona, index) => (
+                        <MenuItem key={index} value={persona}>
+                          {persona}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                {Object.keys(customPercentages).map((category, idx) => (
+                  <Grid item xs={12} sm={6} key={idx}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </InputLabel>
+                      <Select
+                        name={category}
+                        value={customPercentages[category]}
+                        onChange={(e) =>
+                          setCustomPercentages((prev) => ({
+                            ...prev,
+                            [category]: e.target.value,
+                          }))
+                        }
+                        label={category.charAt(0).toUpperCase() + category.slice(1)}
+                      >
+                        {Array.from({ length: 100 }, (_, i) => i + 1).map((num) => (
+                          <MenuItem key={num} value={num}>
+                            {num}%
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+            <Box mt={3} display="flex" justifyContent="space-between">
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleSave}
+                className="animated-button save-button"
+              >
+                Save
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={handleSubmit}
+                className="animated-button start-button"
+              >
+                Start Investing your savings
+              </Button>
+            </Box>
+            <Box mt={2} textAlign="center">
+              <Typography variant="h6">
+                Savings: ${Number(updatedIncome).toFixed(2)}
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+    </Container>
   );
 };
 
