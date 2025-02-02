@@ -1,0 +1,27 @@
+.homePage {
+    // Additional homepage styling can go here.
+  }
+  
+  .animated-button {
+    animation: pulse 2s infinite;
+    transition: transform 0.3s ease-in-out;
+    padding: 12px 24px;
+    font-size: 1.2rem;
+  }
+  
+  .animated-button:hover {
+    transform: scale(1.1);
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(25, 118, 210, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(25, 118, 210, 0);
+    }
+  }
+  

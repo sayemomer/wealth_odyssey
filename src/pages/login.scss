@@ -1,0 +1,37 @@
+.animated-button {
+    transition: transform 0.3s ease-in-out;
+    /* Common styling for both buttons */
+  }
+  
+  .animated-button:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Pulsing effect for the Start Investing button */
+  .start-button {
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
+  }
+  
+  /* Optional subtle shake effect for the Save button */
+  .save-button {
+    animation: shake 1s infinite;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-2px); }
+    40%, 80% { transform: translateX(2px); }
+  }
+  
