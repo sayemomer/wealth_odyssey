@@ -1,35 +1,35 @@
 import React, { useState } from "react";
 import "./scenario.scss";
 import { useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import IconButton from "@mui/material/IconButton";
+import {
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Paper,
+  Divider,
+} from "@mui/material";
 import { financialSummaryData } from "../../assets/financialSummaryData";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { scenatioData } from "../../assets/scenatioData";
-import { useWindowSize } from 'react-use'
-import Confetti from 'react-confetti'
+import { useWindowSize } from "react-use";
+import Confetti from "react-confetti";
 
 const Scenario = () => {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
-  const [showHint, setShowHint] = useState(false);
-  const scenario = financialSummaryData[currentScenarioIndex];
   const [showResponse, setShowResponse] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
-  const navigate = useNavigate();
-  const { width, height } = useWindowSize()
   const [resultText, setResultText] = useState(null);
-
-
+  const navigate = useNavigate();
+  const scenario = financialSummaryData[currentScenarioIndex];
+  const { width, height } = useWindowSize();
 
   const handleBullishClick = () => {
     setShowResponse(true);
     setButtonsDisabled(true);
-
+    
     // Determine WIN or LOSE based on stock data
     const stockData = scenario.stock?.data || [];
     const firstValue = stockData.length > 0 ? stockData[0].close : 0;
@@ -57,31 +57,32 @@ const Scenario = () => {
 
   // Extract investment factors
   const investmentFactors = scenario.investment_factors?.most_likely_factors || {};
-  
-  // Confetti factors
-  const particleCount= 500;
-  const stop= false;
 
+  // Confetti factors
+  const stop = false;
+  const confettiNum = 200;
+  
   return (
-    <>
-      {resultText === "WIN" && <Confetti width={width} height={height} numberOfPieces={particleCount} recycle={stop} />}
-      <section className="question">
-        <div className="scenario">
-          <div className="scenario__text">
-            <Typography variant="h3" component="h3">
+    <Container maxWidth="md">
+      {resultText === "WIN" && <Confetti width={width} height={height} recycle={stop} numberOfPieces={confettiNum} />}
+      <Card className="scenario-card" sx={{ mt: 4 }}>
+        <CardContent>
+          <Box className="scenario-header" sx={{ mb: 2, textAlign: "center" }}>
+            <Typography variant="h4" component="h3">
               {scenario.title}
             </Typography>
-            <p className="scenario__text-description">
-              {scenario.summary.text}
-            </p>
-          </div>
-
-          <div className="scenario__actionButtons">
+          </Box>
+          <Divider />
+          <Box className="scenario-description" sx={{ my: 2 }}>
+            <Typography variant="body1">{scenario.summary.text}</Typography>
+          </Box>
+          <Box className="scenario-actionButtons" sx={{ textAlign: "center" }}>
             <Button
               variant="contained"
               color="success"
               onClick={handleBullishClick}
               disabled={buttonsDisabled}
+              sx={{ mx: 1 }}
             >
               Bullish
             </Button>
@@ -89,45 +90,46 @@ const Scenario = () => {
               variant="contained"
               color="error"
               disabled={buttonsDisabled}
+              sx={{ mx: 1 }}
             >
               Bearish
             </Button>
-          </div>
-        </div>
-      </section>
+          </Box>
+        </CardContent>
+      </Card>
       {showResponse && (
-        <section className="response">
-          <p>{resultText}</p>
-          {/* LineChart for Stock Data */}
-          <div className="scenario__chart">
-            <Typography variant="h6" component="h6">
-              Stock Price Trend ({scenario.stock.symbol})
-            </Typography>
-            <LineChart
-              xAxis={[{ scaleType: "point", data: xAxisData }]}
-              series={[
-                {
-                  data: seriesData,
-                  label: "Closing Price",
-                },
-              ]}
-              width={600}
-              height={300}
-            />
-          </div>
-          <div className="investment-factors">
-              <Typography variant="h6">Investment Factors</Typography>
-              <ul>
-                {Object.entries(investmentFactors).map(([key, value]) => (
-                  <li key={key}>{value}</li>
-                ))}
-              </ul>
-            </div>
-          <div className="response__buttons">
+        <Paper className="response-section" elevation={3} sx={{ mt: 4, p: 3 }}>
+          <Typography variant="h6" align="center" gutterBottom>
+            Stock Price Trend ({scenario.stock.symbol})
+          </Typography>
+          <LineChart
+            xAxis={[{ scaleType: "point", data: xAxisData }]}
+            series={[
+              {
+                data: seriesData,
+                label: "Closing Price",
+              },
+            ]}
+            width={600}
+            height={300}
+          />
+          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
+            {resultText}
+          </Typography>
+          <Box className="investment-factors" sx={{ mt: 3 }}>
+            <Typography variant="h6" align="center">Investment Factors</Typography>
+            <ul>
+              {Object.entries(investmentFactors).map(([key, value]) => (
+                <li key={key}>{value}</li>
+              ))}
+            </ul>
+          </Box>
+          <Box className="response-buttons" sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}>
             <Button
               variant="contained"
               color="primary"
               onClick={handleReinvest}
+              sx={{ px: 3 }}
             >
               Re-invest
             </Button>
@@ -135,47 +137,15 @@ const Scenario = () => {
               variant="contained"
               color="primary"
               onClick={handleHomeClick}
+              sx={{ px: 3 }}
             >
               Home
             </Button>
-          </div>
-        </section>
+          </Box>
+        </Paper>
       )}
-    </>
+    </Container>
   );
 };
 
 export default Scenario;
-
-// const handleNext = () => {
-//   if (currentScenarioIndex < financialSummaryData.length - 1) {
-//     setCurrentScenarioIndex(currentScenarioIndex + 1);
-//   }
-// };
-
-// const handlePrevious = () => {
-//   if (currentScenarioIndex > 0) {
-//     setCurrentScenarioIndex(currentScenarioIndex - 1);
-//   }
-// };
-
-{
-  /* <div className="scenario__navigation">
-            <Button
-              variant="contained"
-              onClick={handlePrevious}
-              disabled={currentScenarioIndex === 0}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={
-                currentScenarioIndex === financialSummaryData.length - 1
-              }
-            >
-              Next
-            </Button>
-          </div> */
-}
