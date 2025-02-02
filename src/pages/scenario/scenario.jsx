@@ -7,20 +7,16 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import IconButton from "@mui/material/IconButton";
-import { scenatioData } from "../../assets/scenatioData";
+import { financialSummaryData } from "../../assets/financialSummaryData";
+import { LineChart } from "@mui/x-charts/LineChart";
 
 const Scenario = () => {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [showHint, setShowHint] = useState(false);
-  const scenario = scenatioData[currentScenarioIndex];
-  const [checked, setChecked] = React.useState(true);
-
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
-  };
+  const scenario = financialSummaryData[currentScenarioIndex];
 
   const handleNext = () => {
-    if (currentScenarioIndex < scenatioData.length - 1) {
+    if (currentScenarioIndex < financialSummaryData.length - 1) {
       setCurrentScenarioIndex(currentScenarioIndex + 1);
     }
   };
@@ -31,6 +27,11 @@ const Scenario = () => {
     }
   };
 
+  // Extract stock data for chart
+  const stockData = scenario.stock?.data || [];
+  const xAxisData = stockData.map((entry) => entry.date); // Dates for x-axis
+  const seriesData = stockData.map((entry) => entry.close); // Closing prices for y-axis
+
   return (
     <div className="scenario">
       <div className="scenario__text">
@@ -39,6 +40,7 @@ const Scenario = () => {
         </Typography>
         <p className="scenario__text-description">{scenario.summary.text}</p>
       </div>
+
       <div className="scenario__factor">
         <div className="scenario__factor-grid">
           {scenario.table.rows.map((row, index) => (
@@ -66,6 +68,34 @@ const Scenario = () => {
           ))}
         </div>
       </div>
+
+      {/* LineChart for Stock Data */}
+      <div className="scenario__chart">
+        <Typography variant="h6" component="h6">
+          Stock Price Trend ({scenario.stock.symbol})
+        </Typography>
+        <LineChart
+          xAxis={[{ scaleType: "point", data: xAxisData }]}
+          series={[
+            {
+              data: seriesData,
+              label: "Closing Price",
+            },
+          ]}
+          width={600}
+          height={300}
+        />
+      </div>
+
+      <div className="scenario__actionButtons">
+        <Button variant="contained" color="success">
+          Bullish
+        </Button>
+        <Button variant="contained" color="error">
+          Bearish
+        </Button>
+      </div>
+
       <div className="scenario__navigation">
         <Button
           variant="contained"
@@ -77,17 +107,9 @@ const Scenario = () => {
         <Button
           variant="contained"
           onClick={handleNext}
-          disabled={currentScenarioIndex === scenatioData.length - 1}
+          disabled={currentScenarioIndex === financialSummaryData.length - 1}
         >
           Next
-        </Button>
-      </div>
-      <div className="scenario__actionButtons">
-        <Button variant="contained" color="success">
-          Bullish
-        </Button>
-        <Button variant="contained" color="error">
-          Bearish
         </Button>
       </div>
     </div>
