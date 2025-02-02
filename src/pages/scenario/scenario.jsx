@@ -1,96 +1,178 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./scenario.scss";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import IconButton from "@mui/material/IconButton";
+import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Paper,
+  Divider,
+} from "@mui/material";
+import { financialSummaryData } from "../../assets/financialSummaryData";
+import { LineChart } from "@mui/x-charts/LineChart";
 import { scenatioData } from "../../assets/scenatioData";
+import { useWindowSize } from "react-use";
+import Confetti from "react-confetti";
 
 const Scenario = () => {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
-  const [showHint, setShowHint] = useState(false);
-  const scenario = scenatioData[currentScenarioIndex];
-  const [checked, setChecked] = React.useState(true);
+  const [showResponse, setShowResponse] = useState(false);
+  const [buttonsDisabled, setButtonsDisabled] = useState(false);
+  const [resultText, setResultText] = useState(null);
+  const navigate = useNavigate();
+  const scenario = financialSummaryData[currentScenarioIndex];
+  const { width, height } = useWindowSize();
+  const [savings, setSavings] = useState(0);
 
-  const handleChange = (event) => {
-    setChecked(event.target.checked);
+  const handleBullishClick = () => {
+    setShowResponse(true);
+    setButtonsDisabled(true);
+
+    // Determine WIN or LOSE based on stock data
+    const stockData = scenario.stock?.data || [];
+    const firstValue = stockData.length > 0 ? stockData[0].close : 0;
+    const lastValue =
+      stockData.length > 0 ? stockData[stockData.length - 1].close : 0;
+    setResultText(lastValue > firstValue ? "WIN" : "LOSE");
   };
 
-  const handleNext = () => {
+  const handleHomeClick = () => {
+    navigate("/home");
+  };
+
+  const handleReinvest = () => {
     if (currentScenarioIndex < scenatioData.length - 1) {
       setCurrentScenarioIndex(currentScenarioIndex + 1);
+      setShowResponse(false);
+      setButtonsDisabled(false);
+      setResultText(null);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentScenarioIndex > 0) {
-      setCurrentScenarioIndex(currentScenarioIndex - 1);
+  // Extract stock data for chart
+  const stockData = scenario.stock?.data || [];
+  const xAxisData = stockData.map((entry) => entry.date); // Dates for x-axis
+  const seriesData = stockData.map((entry) => entry.close); // Closing prices for y-axis
+
+  // Extract investment factors
+  const investmentFactors =
+    scenario.investment_factors?.most_likely_factors || {};
+
+  // Confetti factors
+  const stop = false;
+  const confettiNum = 700;
+
+  useEffect(() => {
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
+    if (storedUserData && storedUserData.saving) {
+      setSavings(storedUserData.saving);
+    } else {
+      setSavings(1000); // Default value if no data is found
     }
-  };
+  }, []);
+  
 
   return (
-    <div className="scenario">
-      <div className="scenario__text">
-        <Typography variant="h3" component="h3">
-          {scenario.title}
-        </Typography>
-        <p className="scenario__text-description">{scenario.summary.text}</p>
-      </div>
-      <div className="scenario__factor">
-        <div className="scenario__factor-grid">
-          {scenario.table.rows.map((row, index) => (
-            <FormGroup key={index}>
-              <div className="scenario__factor-item">
-                <div className="scenario__factor-hint">
-                  <FormControlLabel control={<Checkbox />} label={row[0]} />
-                  <IconButton
-                    onClick={() =>
-                      setShowHint(index === showHint ? null : index)
-                    }
-                    size="small"
-                  >
-                    <HelpOutlineIcon fontSize="small" />
-                  </IconButton>
-                </div>
-                {showHint === index && (
-                  <div className="scenario__factor-hint__text">
-                    <p className="scenario__factor-hint__text-pos">{row[1]}</p>
-                    <p className="scenario__factor-hint__text-neg">{row[2]}</p>
-                  </div>
-                )}
-              </div>
-            </FormGroup>
-          ))}
-        </div>
-      </div>
-      <div className="scenario__navigation">
-        <Button
-          variant="contained"
-          onClick={handlePrevious}
-          disabled={currentScenarioIndex === 0}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleNext}
-          disabled={currentScenarioIndex === scenatioData.length - 1}
-        >
-          Next
-        </Button>
-      </div>
-      <div className="scenario__actionButtons">
-        <Button variant="contained" color="success">
-          Bullish
-        </Button>
-        <Button variant="contained" color="error">
-          Bearish
-        </Button>
-      </div>
-    </div>
+    <Container maxWidth="md">
+      {resultText === "WIN" && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={stop}
+          numberOfPieces={confettiNum}
+        />
+      )}
+      <Card className="scenario-card" sx={{ mt: 4 }}>
+        <CardContent>
+          <Box className="scenario-header" sx={{ mb: 2, textAlign: "center" }}>
+            <Typography variant="h4" component="h3">
+              {scenario.title}
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              Cash: ${savings.toFixed(2)}
+            </Typography>
+          </Box>
+          <Divider />
+          <Box className="scenario-description" sx={{ my: 2 }}>
+            <Typography variant="body1">{scenario.summary.text}</Typography>
+          </Box>
+          <Box className="scenario-actionButtons" sx={{ textAlign: "center" }}>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={handleBullishClick}
+              disabled={buttonsDisabled}
+              sx={{ mx: 1 }}
+            >
+              Bullish
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              disabled={buttonsDisabled}
+              sx={{ mx: 1 }}
+            >
+              Bearish
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+      {showResponse && (
+        <Paper className="response-section" elevation={3} sx={{ mt: 4, p: 3 }}>
+          <Typography variant="h6" align="center" gutterBottom>
+            Stock Price Trend ({scenario.stock.symbol})
+          </Typography>
+          <LineChart
+            xAxis={[{ scaleType: "point", data: xAxisData }]}
+            series={[
+              {
+                data: seriesData,
+                label: "Closing Price",
+              },
+            ]}
+            width={600}
+            height={300}
+          />
+          <Typography variant="h6" align="center" sx={{ mt: 2 }}>
+            {resultText}
+          </Typography>
+          <Box className="investment-factors" sx={{ mt: 3 }}>
+            <Typography variant="h6" align="center">
+              Investment Factors
+            </Typography>
+            <ul>
+              {Object.entries(investmentFactors).map(([key, value]) => (
+                <li key={key}>{value}</li>
+              ))}
+            </ul>
+          </Box>
+          <Box
+            className="response-buttons"
+            sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleReinvest}
+              sx={{ px: 3 }}
+            >
+              Re-invest
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleHomeClick}
+              sx={{ px: 3 }}
+            >
+              Home
+            </Button>
+          </Box>
+        </Paper>
+      )}
+    </Container>
   );
 };
 
