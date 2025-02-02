@@ -12,7 +12,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
-import { userData } from "../assets/userData";
+import { spendingPersonasData } from "../assets/spendingPersonasData"; // Assuming this is an array of objects
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ const Login = () => {
     income: "",
     userPersona: ""
   });
+  const [updatedIncome, setUpdatedIncome] = useState(null); // To store the updated income
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -32,7 +33,23 @@ const Login = () => {
   };
 
   const handleSubmit = () => {
-    localStorage.setItem("userData", JSON.stringify(formData));
+    // Get the selected persona data
+    const selectedPersona = formData.userPersona;
+    const personaData = spendingPersonasData[0][selectedPersona]; // Fetch data of the selected persona
+    if (personaData) {
+      // Sum up all the percentages of the categories for the selected persona
+      const totalPercentage = Object.values(personaData).reduce((acc, curr) => acc + curr, 0);
+      // Calculate the deduction from the income based on the total percentage
+      const deductionAmount = (formData.income * totalPercentage) / 100;
+      const newIncome = formData.income - deductionAmount;
+      setUpdatedIncome(newIncome); // Update the income with the deduction
+
+      // Update the form data with the new income
+      const updatedFormData = { ...formData, saving: newIncome };
+  
+      // Save the updated form data (including new income) to local storage
+      localStorage.setItem("userData", JSON.stringify(updatedFormData));
+    }
     navigate("/scenario");
   };
 
@@ -75,9 +92,9 @@ const Login = () => {
           value={formData.userPersona}
           onChange={handleChange}
         >
-          {userData.map((user, index) => (
-            <MenuItem key={index} value={user.selected_persona.name}>
-              {user.selected_persona.name}
+          {Object.keys(spendingPersonasData[0]).map((persona, index) => (
+            <MenuItem key={index} value={persona}>
+              {persona}
             </MenuItem>
           ))}
         </Select>
@@ -86,6 +103,13 @@ const Login = () => {
       <Button variant="contained" color="success" fullWidth onClick={handleSubmit}>
         Start
       </Button>
+
+      {/* Optionally, display the updated income */}
+      {updatedIncome !== null && (
+        <div className="updated-income">
+          <h3>Updated Income: ${updatedIncome.toFixed(2)}</h3>
+        </div>
+      )}
     </div>
   );
 };
