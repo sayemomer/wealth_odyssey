@@ -42,6 +42,11 @@ const Scenario = () => {
   const xAxisData = stockData.map((entry) => entry.date); // Dates for x-axis
   const seriesData = stockData.map((entry) => entry.close); // Closing prices for y-axis
 
+  // Determine WIN or LOSE based on stock data
+  const firstValue = stockData.length > 0 ? stockData[0].close : 0;
+  const lastValue = stockData.length > 0 ? stockData[stockData.length - 1].close : 0;
+  const resultText = lastValue > firstValue ? "WIN" : "LOSE";
+
   return (
     <>
       <section className="question">
@@ -93,6 +98,7 @@ const Scenario = () => {
               height={300}
             />
           </div>
+          <p>{resultText}</p>
           <div className="response__buttons">
             <Button
               variant="contained"
