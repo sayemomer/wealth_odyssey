@@ -11,6 +11,8 @@ import IconButton from "@mui/material/IconButton";
 import { financialSummaryData } from "../../assets/financialSummaryData";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { scenatioData } from "../../assets/scenatioData";
+import { useWindowSize } from 'react-use'
+import Confetti from 'react-confetti'
 
 const Scenario = () => {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
@@ -19,10 +21,20 @@ const Scenario = () => {
   const [showResponse, setShowResponse] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const navigate = useNavigate();
+  const { width, height } = useWindowSize()
+  const [resultText, setResultText] = useState(null);
+
+
 
   const handleBullishClick = () => {
     setShowResponse(true);
     setButtonsDisabled(true);
+
+    // Determine WIN or LOSE based on stock data
+    const stockData = scenario.stock?.data || [];
+    const firstValue = stockData.length > 0 ? stockData[0].close : 0;
+    const lastValue = stockData.length > 0 ? stockData[stockData.length - 1].close : 0;
+    setResultText(lastValue > firstValue ? "WIN" : "LOSE");
   };
 
   const handleHomeClick = () => {
@@ -34,6 +46,7 @@ const Scenario = () => {
       setCurrentScenarioIndex(currentScenarioIndex + 1);
       setShowResponse(false);
       setButtonsDisabled(false);
+      setResultText(null);
     }
   };
 
@@ -42,13 +55,16 @@ const Scenario = () => {
   const xAxisData = stockData.map((entry) => entry.date); // Dates for x-axis
   const seriesData = stockData.map((entry) => entry.close); // Closing prices for y-axis
 
-  // Determine WIN or LOSE based on stock data
-  const firstValue = stockData.length > 0 ? stockData[0].close : 0;
-  const lastValue = stockData.length > 0 ? stockData[stockData.length - 1].close : 0;
-  const resultText = lastValue > firstValue ? "WIN" : "LOSE";
+  // Extract investment factors
+  const investmentFactors = scenario.investment_factors?.most_likely_factors || {};
+  
+  // Confetti factors
+  const particleCount= 500;
+  const stop= false;
 
   return (
     <>
+      {resultText === "WIN" && <Confetti width={width} height={height} numberOfPieces={particleCount} recycle={stop} />}
       <section className="question">
         <div className="scenario">
           <div className="scenario__text">
@@ -81,6 +97,7 @@ const Scenario = () => {
       </section>
       {showResponse && (
         <section className="response">
+          <p>{resultText}</p>
           {/* LineChart for Stock Data */}
           <div className="scenario__chart">
             <Typography variant="h6" component="h6">
@@ -98,7 +115,14 @@ const Scenario = () => {
               height={300}
             />
           </div>
-          <p>{resultText}</p>
+          <div className="investment-factors">
+              <Typography variant="h6">Investment Factors</Typography>
+              <ul>
+                {Object.entries(investmentFactors).map(([key, value]) => (
+                  <li key={key}>{value}</li>
+                ))}
+              </ul>
+            </div>
           <div className="response__buttons">
             <Button
               variant="contained"
