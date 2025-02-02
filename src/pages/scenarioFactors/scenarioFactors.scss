@@ -6,6 +6,8 @@
 
   }
   &__factor{
+    margin-bottom: 20px;
+    
     &-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -23,10 +25,25 @@
       &__text {
         display: flex;
         flex-direction: column;
+        gap: 6px;
+        
+
+        &-pos {
+          color: #2E7D32;
+          margin: 0px;
+        }
+        &-neg {
+          color: #D3302F;
+          margin: 0px;
+        }
       }
     }
   }
 
-
+  &__actionButtons {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
   
 }

@@ -47,7 +47,9 @@ const Scenario = () => {
                 <div className="scenario__factor-hint">
                   <FormControlLabel control={<Checkbox />} label={row[0]} />
                   <IconButton
-                    onClick={() => setShowHint(index === showHint ? null : index)}
+                    onClick={() =>
+                      setShowHint(index === showHint ? null : index)
+                    }
                     size="small"
                   >
                     <HelpOutlineIcon fontSize="small" />
@@ -65,19 +67,29 @@ const Scenario = () => {
         </div>
       </div>
       <div className="scenario__navigation">
-        <Button variant="contained" onClick={handlePrevious} disabled={currentScenarioIndex === 0}>
+        <Button
+          variant="contained"
+          onClick={handlePrevious}
+          disabled={currentScenarioIndex === 0}
+        >
           Previous
         </Button>
-        <Button variant="contained" onClick={handleNext} disabled={currentScenarioIndex === scenatioData.length - 1}>
+        <Button
+          variant="contained"
+          onClick={handleNext}
+          disabled={currentScenarioIndex === scenatioData.length - 1}
+        >
           Next
         </Button>
       </div>
-      <Button variant="contained" color="success">
-        Bullish
-      </Button>
-      <Button variant="contained" color="error">
-        Bearish
-      </Button>
+      <div className="scenario__actionButtons">
+        <Button variant="contained" color="success">
+          Bullish
+        </Button>
+        <Button variant="contained" color="error">
+          Bearish
+        </Button>
+      </div>
     </div>
   );
 };
