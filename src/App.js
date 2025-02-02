@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import './App.scss';
+import './App.css';
+import Button from './components/button/button';
+import Scenario from './pages/scenario/scenario';
+import Login from './pages/login';
+import { BrowserRouter } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import { Routes } from 'react-router-dom';
+
 
 // Define preset ideal expenditure percentages (in % of income)
 const presets = {
@@ -118,8 +125,14 @@ function App() {
   return (
     <div className="app">
       <h1>Financial Wellness Companion</h1>
+      <BrowserRouter>
+        <Routes> {/* Wrap your Route components inside <Routes> */}
+          <Route path="/scenario" element={<Scenario />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
 
-      {/* User Profile Setup */}
+      {/* User Profile Setup
       <div className="form-section">
         <h2>User Profile Setup</h2>
         <div className="input-group">
@@ -176,7 +189,7 @@ function App() {
       </div>
 
       {/* Estimated Expenditure Section */}
-      <div className="form-section">
+      {/* <div className="form-section">
         <h2>Estimated Expenditure (Percentage of Income)</h2>
         {Object.keys(presets[preset]).map((cat) => (
           <div className="input-group" key={cat}>
@@ -206,7 +219,7 @@ function App() {
       </div>
 
       {/* Actual Expense Section */}
-      <div className="form-section">
+      {/* <div className="form-section">
         <h2>Actual Expenses (in USD)</h2>
         {Object.keys(presets[preset]).map((cat) => (
           <div className="input-group" key={cat}>
@@ -233,7 +246,7 @@ function App() {
             Updated Savings: {updatedSavings.toFixed(2)}%
           </div>
         )}
-      </div>
+      </div>  */}
     </div>
   );
 }
