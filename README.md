@@ -1,6 +1,9 @@
 # Dataset for this project
 
 https://www.kaggle.com/datasets/bigquery/sec-filings
+https://www.kaggle.com/datasets/qks1lver/financial-data-of-4400-public-companies
+https://arxiv.org/html/2404.05101v1
+https://paperswithcode.com/paper/trade-the-event-corporate-events-detection
 
 # Getting Started with Create React App
 
