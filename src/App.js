@@ -14,7 +14,7 @@ function App() {
       <div className="app">
         <Routes>
           <Route path="/scenario" element={<Scenario />} />
-          <Route path="/scenarioFact" element={<ScenarioFactors />} />
+          <Route path="/scenarioFactors" element={<ScenarioFactors />} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/gameinfo" element={<GameInfoPage/>} />

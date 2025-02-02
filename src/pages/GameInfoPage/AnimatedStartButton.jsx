@@ -7,7 +7,7 @@ const AnimatedStartButton = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/scenario");
+    navigate("/scenarioFactors");
   };
 
   return (
