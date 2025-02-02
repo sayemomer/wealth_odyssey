@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import './App.css';
 import Button from './components/button/button';
-import ScenarioFactors from './pages/scenarioFactors/scenarioFactors';
+import Scenario from './pages/scenario/scenario';
+import Login from './pages/login';
+import { BrowserRouter } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import { Routes } from 'react-router-dom';
+
 
 // Define preset ideal expenditure percentages (in % of income)
 const presets = {
@@ -120,7 +125,12 @@ function App() {
   return (
     <div className="app">
       <h1>Financial Wellness Companion</h1>
-      <ScenarioFactors />
+      <BrowserRouter>
+        <Routes> {/* Wrap your Route components inside <Routes> */}
+          <Route path="/scenario" element={<Scenario />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
 
       {/* User Profile Setup
       <div className="form-section">
