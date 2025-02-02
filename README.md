@@ -1,3 +1,7 @@
+# Dataset for this project
+
+https://www.kaggle.com/datasets/bigquery/sec-filings
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
