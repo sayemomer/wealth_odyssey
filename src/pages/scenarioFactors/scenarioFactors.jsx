@@ -17,6 +17,8 @@ import {
 } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { scenatioData } from "../../assets/scenatioData";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 import "./scenarioFactors.scss";
 
 const ScenarioFactors = () => {
@@ -29,12 +31,16 @@ const ScenarioFactors = () => {
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const [matchedFactors, setMatchedFactors] = useState([]);
   const scenario = scenatioData[currentScenarioIndex];
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
 
   useEffect(() => {
-    const storedSavings = JSON.parse(localStorage.getItem("userSavings")) || {
-      amount: 1000,
-    };
-    setSavings(storedSavings.amount);
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
+    if (storedUserData && storedUserData.saving) {
+      setSavings(storedUserData.saving);
+    } else {
+      setSavings(1000); // Default value if no data is found
+    }
   }, []);
 
   const handleFactorCheck = (index) => {
@@ -59,7 +65,11 @@ const ScenarioFactors = () => {
     if (matchPercentage > 60) {
       const newSavings = savings * 1.05;
       setSavings(newSavings);
-      localStorage.setItem("userSavings", JSON.stringify({ amount: newSavings }));
+      localStorage.setItem(
+        "userSavings",
+        JSON.stringify({ amount: newSavings })
+      );
+      setShowConfetti(true);
     }
   };
 
@@ -86,6 +96,7 @@ const ScenarioFactors = () => {
       setButtonsDisabled(false);
       setCheckedFactors([]);
       setMatchedFactors([]);
+      setShowConfetti(false);
     }
   };
 
@@ -102,8 +113,20 @@ const ScenarioFactors = () => {
       text: scenario.investment_factors.most_likely_factors[factor],
     }));
 
+  // Confetti factors
+  const stop = false;
+  const confettiNum = 700;
+
   return (
     <Container maxWidth="md">
+      {showConfetti && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={stop}
+          numberOfPieces={confettiNum}
+        />
+      )}
       <Card className="scenario-card">
         <CardContent>
           <Box className="scenario-header" sx={{ mb: 2 }}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./scenario.scss";
 import { useNavigate } from "react-router-dom";
 import {
@@ -25,15 +25,17 @@ const Scenario = () => {
   const navigate = useNavigate();
   const scenario = financialSummaryData[currentScenarioIndex];
   const { width, height } = useWindowSize();
+  const [savings, setSavings] = useState(0);
 
   const handleBullishClick = () => {
     setShowResponse(true);
     setButtonsDisabled(true);
-    
+
     // Determine WIN or LOSE based on stock data
     const stockData = scenario.stock?.data || [];
     const firstValue = stockData.length > 0 ? stockData[0].close : 0;
-    const lastValue = stockData.length > 0 ? stockData[stockData.length - 1].close : 0;
+    const lastValue =
+      stockData.length > 0 ? stockData[stockData.length - 1].close : 0;
     setResultText(lastValue > firstValue ? "WIN" : "LOSE");
   };
 
@@ -56,20 +58,41 @@ const Scenario = () => {
   const seriesData = stockData.map((entry) => entry.close); // Closing prices for y-axis
 
   // Extract investment factors
-  const investmentFactors = scenario.investment_factors?.most_likely_factors || {};
+  const investmentFactors =
+    scenario.investment_factors?.most_likely_factors || {};
 
   // Confetti factors
   const stop = false;
-  const confettiNum = 200;
+  const confettiNum = 700;
+
+  useEffect(() => {
+    const storedUserData = JSON.parse(localStorage.getItem("userData"));
+    if (storedUserData && storedUserData.saving) {
+      setSavings(storedUserData.saving);
+    } else {
+      setSavings(1000); // Default value if no data is found
+    }
+  }, []);
   
+
   return (
     <Container maxWidth="md">
-      {resultText === "WIN" && <Confetti width={width} height={height} recycle={stop} numberOfPieces={confettiNum} />}
+      {resultText === "WIN" && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={stop}
+          numberOfPieces={confettiNum}
+        />
+      )}
       <Card className="scenario-card" sx={{ mt: 4 }}>
         <CardContent>
           <Box className="scenario-header" sx={{ mb: 2, textAlign: "center" }}>
             <Typography variant="h4" component="h3">
               {scenario.title}
+            </Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              Cash: ${savings.toFixed(2)}
             </Typography>
           </Box>
           <Divider />
@@ -117,14 +140,19 @@ const Scenario = () => {
             {resultText}
           </Typography>
           <Box className="investment-factors" sx={{ mt: 3 }}>
-            <Typography variant="h6" align="center">Investment Factors</Typography>
+            <Typography variant="h6" align="center">
+              Investment Factors
+            </Typography>
             <ul>
               {Object.entries(investmentFactors).map(([key, value]) => (
                 <li key={key}>{value}</li>
               ))}
             </ul>
           </Box>
-          <Box className="response-buttons" sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}>
+          <Box
+            className="response-buttons"
+            sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}
+          >
             <Button
               variant="contained"
               color="primary"
