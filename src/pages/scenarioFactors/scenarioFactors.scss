@@ -70,3 +70,74 @@
   gap: 20px;
 }
 }
+
+.scenario-card {
+  margin-top: 20px;
+  padding: 16px;
+}
+
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scenario-description {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.scenario-factors {
+  margin-top: 20px;
+}
+
+.factor-item {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f7f7f7;
+  transition: background-color 0.3s ease;
+  &:hover {
+    background-color: #e0f7fa;
+  }
+}
+
+.hint-text {
+  background-color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.action-buttons {
+  margin-top: 20px;
+  button {
+    margin: 0 8px;
+  }
+}
+
+.response-section {
+  margin-top: 30px;
+  padding: 20px;
+}
+
+.animated-button {
+  transition: transform 0.3s ease-in-out;
+  &:hover {
+    transform: scale(1.1);
+  }
+  &.pulse {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
