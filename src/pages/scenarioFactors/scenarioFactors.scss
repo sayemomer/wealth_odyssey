@@ -1,13 +1,22 @@
 // scenarioFactors.scss
 
 .scenario {
+
+  &__headingContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    align-items: center;
+    
+  
+  }
   &__text
     &-description {
 
   }
   &__factor{
     margin-bottom: 20px;
-    
+
     &-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
