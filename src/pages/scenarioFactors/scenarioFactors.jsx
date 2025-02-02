@@ -32,6 +32,8 @@ const ScenarioFactors = () => {
   };
 
   return (
+    <>
+    <section className="question">
     <div className="scenario">
       <div className="scenario__text">
         <Typography variant="h3" component="h3">
@@ -75,6 +77,11 @@ const ScenarioFactors = () => {
         </Button>
       </div>
     </div>
+    </section>
+    <section className="response">
+
+    </section>
+    </>
   );
 };
 
