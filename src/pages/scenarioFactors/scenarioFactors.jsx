@@ -1,21 +1,28 @@
 import React, { useState, useEffect } from "react";
-import "./scenarioFactors.scss";
 import { useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import {
+  Container,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  Button,
+  IconButton,
+  Paper,
+  Divider,
+} from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import IconButton from "@mui/material/IconButton";
 import { scenatioData } from "../../assets/scenatioData";
-
-// To do: When click re-invest the checkboxes dont reset
+import "./scenarioFactors.scss";
 
 const ScenarioFactors = () => {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const navigate = useNavigate();
-  const [showHint, setShowHint] = useState(false);
+  const [showHint, setShowHint] = useState(null);
   const [checkedFactors, setCheckedFactors] = useState([]);
   const [savings, setSavings] = useState(0);
   const [showResponse, setShowResponse] = useState(false);
@@ -47,16 +54,12 @@ const ScenarioFactors = () => {
     );
 
     setMatchedFactors(matched);
-
     const matchPercentage = (matched.length / mostLikelyFactors.length) * 100;
 
     if (matchPercentage > 60) {
       const newSavings = savings * 1.05;
       setSavings(newSavings);
-      localStorage.setItem(
-        "userSavings",
-        JSON.stringify({ amount: newSavings })
-      );
+      localStorage.setItem("userSavings", JSON.stringify({ amount: newSavings }));
     }
   };
 
@@ -83,14 +86,6 @@ const ScenarioFactors = () => {
       setButtonsDisabled(false);
       setCheckedFactors([]);
       setMatchedFactors([]);
-      // document.querySelectorAll("input[type=checkbox]").forEach((el) => (el.checked = false));
-      // setCheckedFactors([]);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentScenarioIndex < scenatioData.length - 1) {
-      setCurrentScenarioIndex(currentScenarioIndex + 1);
     }
   };
 
@@ -108,64 +103,67 @@ const ScenarioFactors = () => {
     }));
 
   return (
-    <>
-      <section className="question">
-        <div className="scenario">
-          <div className="scenario__headingContainer">
-            <Typography variant="h3" component="h3">
+    <Container maxWidth="md">
+      <Card className="scenario-card">
+        <CardContent>
+          <Box className="scenario-header" sx={{ mb: 2 }}>
+            <Typography variant="h4" component="h3">
               {scenario.title}
             </Typography>
-            <p className="scenario__cash">{savings}</p>
-          </div>
-          <div className="scenario__text">
-            <p className="scenario__text-description">
-              {scenario.summary.text}
-            </p>
-          </div>
-          <div className="scenario__factor">
-            <div className="scenario__factor-grid">
+            <Typography variant="subtitle1" color="textSecondary">
+              Cash: ${savings.toFixed(2)}
+            </Typography>
+          </Box>
+          <Divider />
+          <Box className="scenario-description" sx={{ my: 2 }}>
+            <Typography variant="body1">{scenario.summary.text}</Typography>
+          </Box>
+          <Box className="scenario-factors">
+            <Grid container spacing={2}>
               {scenario.table.rows.map((row, index) => (
-                <FormGroup key={index}>
-                  <div className="scenario__factor-item">
-                    <div className="scenario__factor-hint">
+                <Grid item xs={12} sm={6} key={index}>
+                  <Paper className="factor-item" elevation={2}>
+                    <FormGroup row>
                       <FormControlLabel
                         control={
                           <Checkbox
                             onChange={() => handleFactorCheck(index + 1)}
+                            checked={checkedFactors.includes(index + 1)}
                           />
                         }
                         label={row[0]}
                       />
                       <IconButton
                         onClick={() =>
-                          setShowHint(index === showHint ? null : index)
+                          setShowHint(showHint === index ? null : index)
                         }
                         size="small"
                       >
                         <HelpOutlineIcon fontSize="small" />
                       </IconButton>
-                    </div>
+                    </FormGroup>
                     {showHint === index && (
-                      <div className="scenario__factor-hint__text">
-                        <p className="scenario__factor-hint__text-pos">
+                      <Box className="hint-text" sx={{ mt: 1 }}>
+                        <Typography variant="body2" color="primary">
                           {row[1]}
-                        </p>
-                        <p className="scenario__factor-hint__text-neg">
+                        </Typography>
+                        <Typography variant="body2" color="error">
                           {row[2]}
-                        </p>
-                      </div>
+                        </Typography>
+                      </Box>
                     )}
-                  </div>
-                </FormGroup>
+                  </Paper>
+                </Grid>
               ))}
-            </div>
-          </div>
-          <div className="scenario__actionButtons">
+            </Grid>
+          </Box>
+          <Box className="action-buttons" sx={{ mt: 3, textAlign: "center" }}>
             <Button
               variant="contained"
               color="success"
               onClick={handleBullishClick}
               disabled={buttonsDisabled}
+              className="animated-button"
             >
               Bullish
             </Button>
@@ -173,42 +171,39 @@ const ScenarioFactors = () => {
               variant="contained"
               color="error"
               disabled={buttonsDisabled}
+              className="animated-button"
             >
               Bearish
             </Button>
-            {/* <Button
-              variant="contained"
-              color="primary"
-              onClick={handleResetSavings}
-            >
-              Reset Savings
-            </Button> */}
-          </div>
-        </div>
-      </section>
+          </Box>
+        </CardContent>
+      </Card>
       {showResponse && (
-        <section className="response">
-          <div className="response__factorChecker">
+        <Paper className="response-section" elevation={3} sx={{ mt: 4, p: 3 }}>
+          <Typography variant="h6" align="center" gutterBottom>
             {`${matchedFactors.length} out of ${mostLikelyFactors.length} factors matched.`}
-            {unmatchedFactors.length > 0 && (
-              <div>
-                <p>Factors not selected:</p>
-                <ul>
-                  {unmatchedFactors.map((factor, index) => (
-                    <li key={index}>
-                      <strong>{factor.name}:</strong> {factor.text}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-          <div className="response__buttons">
+          </Typography>
+          {unmatchedFactors.length > 0 && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1">Factors not selected:</Typography>
+              <ul>
+                {unmatchedFactors.map((factor, index) => (
+                  <li key={index}>
+                    <strong>{factor.name}:</strong> {factor.text}
+                  </li>
+                ))}
+              </ul>
+            </Box>
+          )}
+          <Box
+            className="response-buttons"
+            sx={{ mt: 3, display: "flex", justifyContent: "center", gap: 2 }}
+          >
             <Button
               variant="contained"
               color="primary"
               onClick={handleReinvest}
-              // disabled={currentScenarioIndex === scenatioData.length - 1}
+              className="animated-button"
             >
               Re-invest
             </Button>
@@ -216,13 +211,14 @@ const ScenarioFactors = () => {
               variant="contained"
               color="primary"
               onClick={handleHomeClick}
+              className="animated-button"
             >
               Home
             </Button>
-          </div>
-        </section>
+          </Box>
+        </Paper>
       )}
-    </>
+    </Container>
   );
 };
 

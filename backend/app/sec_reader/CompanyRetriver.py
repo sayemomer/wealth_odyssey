@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import json
+import random
 
 
 def get_random_10Q(cik):
@@ -45,7 +46,7 @@ def get_random_cik():
 
     # print(data)
     # get random cik from the json
-    return str(data["1"]["cik_str"]).zfill(10)
+    return str(data[str(random.randint(1, 100))]["cik_str"]).zfill(10)
 
 
 def txt_url_builder(cik, accessionNumber):
@@ -59,7 +60,7 @@ def txt_url_builder(cik, accessionNumber):
     Returns:
         str: The URL of the text file.
     """
-    non_leading_zeros_cik = cik[-6:]
+    non_leading_zeros_cik = cik[-7:]
     return f"https://www.sec.gov/Archives/edgar/data/{non_leading_zeros_cik}/{accessionNumber}.txt"
 
 
@@ -74,9 +75,7 @@ def full_filing_url_builder(cik, accessionNumber):
     Returns:
         str: The URL of the full filing.
     """
-    non_leading_zeros_cik = cik[-6:]
     accessionNumber_no_dashes = accessionNumber.replace("-", "")
-    #
     return f"https://www.sec.gov/Archives/edgar/data/{cik}/{accessionNumber_no_dashes}/{accessionNumber}-index.html"
 
 
