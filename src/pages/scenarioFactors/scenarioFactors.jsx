@@ -31,6 +31,10 @@ const ScenarioFactors = () => {
     }
   };
 
+  const handleFactorChecker = () => {
+
+  }
+
   return (
     <>
     <section className="question">
@@ -79,7 +83,9 @@ const ScenarioFactors = () => {
     </div>
     </section>
     <section className="response">
-
+      <div className="response__factorChecker">
+        
+      </div>
     </section>
     </>
   );

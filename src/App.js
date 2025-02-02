@@ -6,6 +6,7 @@ import Login from './pages/login';
 import { BrowserRouter } from 'react-router-dom';
 import { Route } from 'react-router-dom';
 import { Routes } from 'react-router-dom';
+import ScenarioFactors from './pages/scenarioFactors/scenarioFactors';
 
 
 // Define preset ideal expenditure percentages (in % of income)
@@ -128,6 +129,7 @@ function App() {
       <BrowserRouter>
         <Routes> {/* Wrap your Route components inside <Routes> */}
           <Route path="/scenario" element={<Scenario />} />
+          <Route path="/scenarioFact" element={<ScenarioFactors />} />
           <Route path="/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
