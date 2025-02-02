@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./scenarioFactors.scss";
+import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Checkbox from "@mui/material/Checkbox";
@@ -9,15 +10,25 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import IconButton from "@mui/material/IconButton";
 import { scenatioData } from "../../assets/scenatioData";
 
+// To do: When click re-invest the checkboxes dont reset
+
 const ScenarioFactors = () => {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
+  const navigate = useNavigate();
   const [showHint, setShowHint] = useState(false);
   const [checkedFactors, setCheckedFactors] = useState([]);
-  const scenario = scenatioData[currentScenarioIndex];
   const [savings, setSavings] = useState(0);
   const [showResponse, setShowResponse] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
-  const [matcFactors, setmatcFactors] = useState([]);
+  const [matchedFactors, setMatchedFactors] = useState([]);
+  const scenario = scenatioData[currentScenarioIndex];
+
+  useEffect(() => {
+    const storedSavings = JSON.parse(localStorage.getItem("userSavings")) || {
+      amount: 1000,
+    };
+    setSavings(storedSavings.amount);
+  }, []);
 
   const handleFactorCheck = (index) => {
     setCheckedFactors((prevChecked) =>
@@ -31,14 +42,13 @@ const ScenarioFactors = () => {
     const mostLikelyFactors = Object.keys(
       scenario.investment_factors.most_likely_factors
     ).map(Number);
-    const matchedFactors = checkedFactors.filter((factor) =>
+    const matched = checkedFactors.filter((factor) =>
       mostLikelyFactors.includes(factor)
     );
 
-    setmatcFactors(matchedFactors);
+    setMatchedFactors(matched);
 
-    const matchPercentage =
-      (matchedFactors.length / mostLikelyFactors.length) * 100;
+    const matchPercentage = (matched.length / mostLikelyFactors.length) * 100;
 
     if (matchPercentage > 60) {
       const newSavings = savings * 1.05;
@@ -48,30 +58,54 @@ const ScenarioFactors = () => {
         JSON.stringify({ amount: newSavings })
       );
     }
-
-    return `${matchedFactors.length} out of ${mostLikelyFactors.length} factors matched.`;
   };
 
-  console.log(scenario.table.rows);
-  console.log(scenario.investment_factors.most_likely_factors);
-
   const handleBullishClick = () => {
-    setButtonsDisabled(true);
     setShowResponse(true);
+    setButtonsDisabled(true);
     handleFactorChecker();
   };
 
   const handleResetSavings = () => {
     setSavings(1000);
+    setButtonsDisabled(false);
     localStorage.setItem("userSavings", JSON.stringify({ amount: 1000 }));
   };
 
-  useEffect(() => {
-    const storedSavings = JSON.parse(localStorage.getItem("userSavings")) || {
-      amount: 1000,
-    };
-    setSavings(storedSavings.amount);
-  }, []);
+  const handleHomeClick = () => {
+    navigate("/home");
+  };
+
+  const handleReinvest = () => {
+    if (currentScenarioIndex < scenatioData.length - 1) {
+      setCurrentScenarioIndex(currentScenarioIndex + 1);
+      setShowResponse(false);
+      setButtonsDisabled(false);
+      setCheckedFactors([]);
+      setMatchedFactors([]);
+      // document.querySelectorAll("input[type=checkbox]").forEach((el) => (el.checked = false));
+      // setCheckedFactors([]);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentScenarioIndex < scenatioData.length - 1) {
+      setCurrentScenarioIndex(currentScenarioIndex + 1);
+    }
+  };
+
+  const mostLikelyFactors = Object.keys(
+    scenario.investment_factors.most_likely_factors
+  ).map(Number);
+
+  const unmatchedFactors = mostLikelyFactors
+    .filter((factor) => !matchedFactors.includes(factor))
+    .map((factor) => ({
+      name:
+        scenario.table.rows.find((row) => row[3] === `factor_${factor}`)?.[0] ||
+        `Factor ${factor}`,
+      text: scenario.investment_factors.most_likely_factors[factor],
+    }));
 
   return (
     <>
@@ -142,25 +176,49 @@ const ScenarioFactors = () => {
             >
               Bearish
             </Button>
-            <Button
+            {/* <Button
               variant="contained"
               color="primary"
               onClick={handleResetSavings}
             >
               Reset Savings
-            </Button>
+            </Button> */}
           </div>
         </div>
       </section>
       {showResponse && (
         <section className="response">
           <div className="response__factorChecker">
-            {`${matcFactors.length} out of  ${
-              Object.keys(scenario.investment_factors.most_likely_factors).map(
-                Number
-              ).length
-            } factors matched.`}
-            
+            {`${matchedFactors.length} out of ${mostLikelyFactors.length} factors matched.`}
+            {unmatchedFactors.length > 0 && (
+              <div>
+                <p>Factors not selected:</p>
+                <ul>
+                  {unmatchedFactors.map((factor, index) => (
+                    <li key={index}>
+                      <strong>{factor.name}:</strong> {factor.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <div className="response__buttons">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleReinvest}
+              // disabled={currentScenarioIndex === scenatioData.length - 1}
+            >
+              Re-invest
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleHomeClick}
+            >
+              Home
+            </Button>
           </div>
         </section>
       )}
@@ -169,22 +227,3 @@ const ScenarioFactors = () => {
 };
 
 export default ScenarioFactors;
-
-{
-  /* <div className="scenario__navigation">
-        <Button
-          variant="contained"
-          onClick={handlePrevious}
-          disabled={currentScenarioIndex === 0}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleNext}
-          disabled={currentScenarioIndex === scenatioData.length - 1}
-        >
-          Next
-        </Button>
-      </div> */
-}
